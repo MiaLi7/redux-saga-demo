@@ -1,11 +1,11 @@
-#基于create-react-app引入redux-saga的脚手架搭建
+# 基于create-react-app引入redux-saga的脚手架搭建
 
-##一、背景介绍
-我们使用redux来管理组件的状态已经很方便了，而且要页面的改变都会通过action和reducer进行处理，但是由于redux的三大原则：单一数据源，state只读，通过纯函数执行修改，而reducer就是纯函数，所以很多的副作用就无法处理了，这时候我们就可以通过redux-saga来处理函数的副作用，并且可以很简单的执行异步请求，对每个异步流程saga都可以实现暂停、停止、启动三种状态。
+## 一、背景介绍
+我们使用`redux`来管理组件的状态已经很方便了，而且要页面的改变都会通过`action`和`reducer`进行处理，但是由于redux的三大原则：**单一数据源，state只读，通过纯函数执行修改**，而`reducer`就是纯函数，所以很多的副作用就无法处理了，这时候我们就可以通过`redux-saga`来处理函数的副作用，并且可以很简单的执行异步请求，对每个异步流程`saga`都可以实现暂停、停止、启动三种状态。
 
 下面我们通过创建项目引入saga搭建脚手架，通过单击按钮时从远程服务器获取一些用户数据的例子来说明saga的使用。
 
-##二、实现步骤
+## 二、实现步骤
 
 ### 1、创建项目
 选择你想要存放项目的路径，假定当前所在的文件目录为` D:\work\workspace\react` ，在目录空白处按住键盘shift键，同时鼠标右键，选择“在此处打开命令窗口”，在打开的命令行窗口中输入命令
@@ -46,11 +46,11 @@
 
 启动项目，项目启动后会自动打开一个浏览器窗口加载页面，则项目启动完成。当浏览器加载页面情况如下图代表启动成功。
 
-
+![启动成功](https://github.com/LiJinLan/redux-saga-demo/raw/master/redux-saga-images/start.png "启动成功")
 
 
 ### 4、下载相关依赖
-先关闭刚才启动的项目，在命令行窗口，同时按住键盘`ctrl+C`按键，在显示的命令处输入“y”即可关闭项目。使用redux-saga要下载的依赖有redux,react-redux,saga,由于我们这个例子用到了异步请求，这里我用的是axios,所以也有下载axios的依赖。在命令行窗口依次输入
+先关闭刚才启动的项目，在命令行窗口，同时按住键盘`ctrl+C`按键，在显示的命令处输入“y”即可关闭项目。使用`redux-saga`要下载的依赖有`redux,react-redux,saga`,由于我们这个例子用到了异步请求，这里我用的是`axios`,所以也有下载`axios`的依赖。在命令行窗口依次输入
 
 	$ npm install redux --save
 	$ npm install react-redux --save
@@ -58,6 +58,8 @@
 	$ npm install axios --save
 
 下载完成后，打开`package.json`文件，即可发现在`dependencies`中多了这些依赖版本号。
+
+![下载依赖](https://github.com/LiJinLan/redux-saga-demo/raw/master/redux-saga-images/package.png "下载依赖")
 
 下载完依赖，就可以启动项目了，在命令行窗口输入:
 
@@ -71,9 +73,9 @@
 ### 6、具体实现过程
 
 #### (1). 创建组件，与store建立连接
-首先，要把页面显示出来，再处理逻辑。在src目录下新建一个components文件夹，新建一个文件index.js,创建组件把页面显示出来，考虑到使用redux,所以使用connect将组件与store建立连接，按钮点击事件就dispatch一个action。在App.js中就把自定义的组件进行组装。
+首先，要把页面显示出来，再处理逻辑。在`src`目录下新建一个`components`文件夹，新建一个文件`index.js`,创建组件把页面显示出来，考虑到使用`redux`,所以使用`connect`将组件与`store`建立连接，按钮点击事件就`dispatch`一个`action`。在`App.js`中就把自定义的组件进行组装。
 
-src/components/index.js代码如下
+`src/components/index.js`代码如下
 
 	import React from 'react';
 	import { connect } from 'react-redux';
@@ -107,7 +109,7 @@ src/components/index.js代码如下
 
 
 
-App.js代码如下：
+`App.js`代码如下：
 
 	import React from 'react';
 	import GetSagaVal from './components/index.js';
@@ -124,7 +126,7 @@ App.js代码如下：
 	export default App;
 
 #### (2). 引入saga,处理异步请求
-在components文件夹下新建一个文件夹saga,里面新建一个文件saga.js,在saga.js中引入saga的generator函数,watchSaga()对组件发出的action进行监听,并调用对应的workerSaga()处理异步请求，处理结束后，put一个新的action给reducer。注意，saga的generator函数写法是function后加一个“*”，且所有的 Effect 如call,put等都必须被 yield 才会执行。
+在`components`文件夹下新建一个文件夹saga,里面新建一个文件`saga.js`,在`saga.js`中引入`saga`的`generator`函数,`watchSaga()`对组件发出的action进行监听,并调用对应的`workerSaga()`处理异步请求，处理结束后，put一个新的action给reducer。注意，saga的generator函数写法是`function`后加一个“*”，且所有的 Effect 如call,put等都必须被 yield 才会执行。
 
 saga.js代码如下：
 
@@ -148,9 +150,9 @@ saga.js代码如下：
 
 
 #### (3). reducer处理
-action被中间件saga处理过之后，发出的一个新的action会被reducer接收，reducer通过action.type执行相应的操作。在components文件夹下新建一个文件夹reducer,里面新建文件reducer.js。
+`action`被中间件`saga`处理过之后，发出的一个新的`action`会被`reducer`接收，reducer通过`action.type`执行相应的操作。在components文件夹下新建一个文件夹reducer,里面新建文件`reducer.js`。
 
-reducer.js代码如下：
+`reducer.js`代码如下：
 
 	import React from 'react';
 	import { combineReducers } from 'redux';
@@ -169,9 +171,9 @@ reducer.js代码如下：
 	});
 
 #### (4). 创建store,启动saga
-前面我们做的都是基本事件逻辑处理，但是还没有真正放在store树上面，而且saga和reducer也还没有启动监听，所以是还不会看到效果的，所以要在index.js入口文件中创建store,并启动saga监听action。
+前面我们做的都是基本事件逻辑处理，但是还没有真正放在`store`树上面，而且`saga`和`reducer`也还没有启动监听，所以是还不会看到效果的，所以要在`index.js`入口文件中创建`store`,并启动`saga`监听`action`。
 
-index.js代码如下：
+`index.js`代码如下：
 
 	import React from 'react';
 	import ReactDOM from 'react-dom';
@@ -204,4 +206,11 @@ index.js代码如下：
 
 ## 三、实现效果
 
+实现的效果如图，页面上显示有一行文字，有一个按钮，下面的“无”字代码现在还没有获取`saga`数据。
+
+![结果1](https://github.com/LiJinLan/redux-saga-demo/raw/master/redux-saga-images/resoult1.png "结果1")
+
+点击一下按钮，获取saga数据，刚才页面上的“无”字改变了，这代表已经获取到了saga数据。
+
+![结果2](https://github.com/LiJinLan/redux-saga-demo/raw/master/redux-saga-images/resoult2.png "结果2")
 
